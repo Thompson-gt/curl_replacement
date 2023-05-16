@@ -14,6 +14,10 @@
 
 `cargo run -- --url "https://pokeapi.co/api/v2/pokemon/ditto" -t`
 
-#### _or this to see all of the options this tool offers_
+#### _this to see all of the options this tool offers_
 
-#### `cargo run -- -h` **or** `cargo run --` _both do the same thing_
+#### `cargo run -- -h`
+
+##### **or**
+
+`cargo run --` _both do the same thing_

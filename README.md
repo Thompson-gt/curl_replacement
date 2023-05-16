@@ -16,8 +16,8 @@
 
 #### _this to see all of the options this tool offers_
 
-#### `cargo run -- -h`
+`cargo run -- -h`
 
-##### **or**
+##### _**or**_
 
 `cargo run --` _both do the same thing_

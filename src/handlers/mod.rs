@@ -9,8 +9,9 @@ pub mod handler {
     use crate::formatters;
 
     pub fn make_request(request_data: formatters::format::RequestData) {
-        //the truncate value is just a bool so cloning isnt expensive
+        //cloning of 2 bools are cheap enough for me not to bother with other ways around the borrow checker
         let truncate = request_data.truncate.clone();
+        let safe_mode = request_data.safe_mode.clone();
         //display request data
         displayers::display::display_request_data(&request_data);
         //make the client in here becuase i am assuming its a synchronious req
@@ -22,7 +23,7 @@ pub mod handler {
                 Err(e) => panic!("error when making the request:{}", e),
             };
         //build response data
-        let response_data = formatters::format::build_response_data(res, truncate);
+        let response_data = formatters::format::build_response_data(res, truncate, safe_mode);
         //display response data
         displayers::display::display_response_data(&response_data);
     }

@@ -37,6 +37,8 @@ pub mod display {
 
         let xhead = if data.xheaders == "noheaders".to_string() {
             crate::displayers::display::not_filled_string("no headers")
+        } else if data.xheaders == "headers hidden".to_string() {
+            crate::displayers::display::warn_filled("headers hidden")
         } else {
             crate::displayers::display::filled_string(&data.xheaders)
         };
@@ -54,6 +56,11 @@ pub mod display {
             crate::formatters::format::RequestType::request_to_string(data.rtype.to_owned())
                 .as_str(),
         );
+        let safe_mode = if data.safe_mode {
+            crate::displayers::display::warn_filled("TRUE")
+        } else {
+            crate::displayers::display::warn_filled("FALSE")
+        };
         print!("{}", welcome_message);
         print!(
             "{}: {}\n",
@@ -91,6 +98,11 @@ pub mod display {
             crate::displayers::display::cat_string("REQUEST TYPE"),
             t
         );
+        print!(
+            "{}: {}\n",
+            crate::displayers::display::cat_string("SAFE MODE?"),
+            safe_mode
+        );
     }
     pub fn display_response_data(data: &formatters::format::ReponseData) {
         let welcome_message =
@@ -108,7 +120,11 @@ pub mod display {
         } else {
             crate::displayers::display::filled_string(&data.content_length)
         };
-        let headers = crate::displayers::display::filled_string(&data.headers);
+        let headers = if !data.safe_view {
+            crate::displayers::display::filled_string(&data.headers)
+        } else {
+            crate::displayers::display::warn_filled(&data.headers)
+        };
         let rm = if data.remote_address.starts_with("failed") {
             crate::displayers::display::not_filled_string(&data.remote_address)
         } else {
@@ -130,6 +146,11 @@ pub mod display {
             crate::displayers::display::filled_string("YES")
         } else {
             crate::displayers::display::warn_filled("NO")
+        };
+        let safe_mode = if data.safe_view {
+            crate::displayers::display::warn_filled("TRUE")
+        } else {
+            crate::displayers::display::warn_filled("FALSE")
         };
         print!("{}", welcome_message);
         print!(
@@ -166,6 +187,11 @@ pub mod display {
             "{}: {}\n",
             crate::displayers::display::cat_string("WAS TRUNCATED?:"),
             truncate
+        );
+        print!(
+            "{}: {}\n",
+            crate::displayers::display::cat_string("SAFE MODE?"),
+            safe_mode
         );
     }
     pub fn display_help() {

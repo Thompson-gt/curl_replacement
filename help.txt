@@ -3,9 +3,10 @@ Options:
       --url <URL>            the full url including http or https(need to use this to specify https instead of http)
   -d, --domain <DOMAIN>      The base url for the request to be built with (defaults to http)
   -x, --xheaders <XHEADERS>  The https headers to be included with the request format == {key:val,...}
-  -p, --params <PARAMS>      Url params to be added into the string when request is made format == {key:val,...}
+  -p, --params <PARAMS>      Url params to be added into the string when request is made format == {key:val,...}    
   -q, --querys <QUERYS>      Url query params to be added into the string when request is made
   -r, --rtype <RTYPE>        HTTP request method
   -t, --truncate             will hide the body response if greater than 500 words(to use this pass the flag no value needed)
+  -s, --safe-mode            will hide the headers in the request and response when displayed to protect sensitive data
   -h, --help                 Print help
   -V, --version              Print version

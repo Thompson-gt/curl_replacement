@@ -15,6 +15,7 @@ pub mod format {
         pub version: String,
         pub body: String,
         pub truncate: bool,
+        pub safe_view: bool,
     }
     //weird this isnt a funcion that comes with the lib
     fn version_to_string(v: reqwest::Version) -> String {
@@ -29,7 +30,11 @@ pub mod format {
     }
     //this will be the funcion to take in response and build it to
     // the custom type so it can be displayed in a readable fashion
-    pub fn build_response_data(data: reqwest::blocking::Response, truncate: bool) -> ReponseData {
+    pub fn build_response_data(
+        data: reqwest::blocking::Response,
+        truncate: bool,
+        safe_view: bool,
+    ) -> ReponseData {
         //match statements are kinda awsesome
         ReponseData {
             status: data.status().to_string(),
@@ -38,7 +43,11 @@ pub mod format {
                 //if error then the length of the content must be 0
                 None => "0".to_string(),
             },
-            headers: crate::formatters::format::headermap_to_string(data.headers()),
+            headers: if !safe_view {
+                crate::formatters::format::headermap_to_string(data.headers())
+            } else {
+                "headers hidden".to_string()
+            },
             remote_address: match data.remote_addr() {
                 Some(a) => a.to_string(),
                 None => "failed to find the servers address".to_string(),
@@ -55,6 +64,7 @@ pub mod format {
                 Err(_) => "no body in response".to_string(),
             },
             truncate,
+            safe_view,
         }
     }
     pub fn headermap_to_string(header: &reqwest::header::HeaderMap) -> String {
@@ -134,32 +144,30 @@ pub mod format {
         #[arg(short, long)]
         #[clap(default_value_t = false)]
         pub truncate: bool,
+        /// will hide the headers in the request and response when displayed to protect sensitive data
+        #[arg(short, long)]
+        #[clap(default_value_t = false)]
+        pub safe_mode: bool,
     }
 
     pub fn parse_json_types(head: String) -> Vec<JsonTypes> {
-        // let mut map = HeaderMap::new();
         let mut harray: Vec<JsonTypes> = Vec::new();
-        if head == "noheaders".to_string() || head == "".to_string() {
+        //this is to check all of the default values possible
+        if head == "noheaders".to_string()
+            || head == "".to_string()
+            || head == "headers hidden".to_string()
+        {
             return harray;
         }
         let head = head.replace("{", "");
         let head = head.replace("}", "");
         let h: Vec<String> = head.split(",").into_iter().map(|c| c.into()).collect();
-        // let _ = head
-        //     .split(",")
-        //     .into_iter()
-        //     .map(|val| val.split_once(":").unwrap())
-        //     .into_iter()
-        //     .clone()
-        //     .map(|curr| map.insert(curr.0, curr.1.parse().unwrap()));
-        // h.into_iter().map(|x| print!("\n{:?}\n", h[1].0));
         let xx: Vec<_> = h
             .iter()
             .map(move |val| {
                 val.split_once(":")
                     .expect("invalid json type given to be parsed")
             })
-            // .map(move |val| val.split_once(":").unwrap())
             .collect();
         for val in xx.into_iter() {
             let w = JsonTypes {
@@ -220,6 +228,7 @@ pub mod format {
         pub querys: String,
         pub rtype: RequestType,
         pub truncate: bool,
+        pub safe_mode: bool,
     }
     //this will be a function that will add the query params and regular
     //params to the url before the request is made
@@ -246,7 +255,13 @@ pub mod format {
                 ),
             },
             xheaders: match args.xheaders {
-                Some(x) => x,
+                Some(x) => {
+                    if !args.safe_mode {
+                        x
+                    } else {
+                        "headers hidden".to_string()
+                    }
+                }
                 None => "noheaders".to_string(),
             },
             params: match args.params {
@@ -262,6 +277,7 @@ pub mod format {
                 None => crate::formatters::format::RequestType::GET,
             },
             truncate: args.truncate,
+            safe_mode: args.safe_mode,
         }
     }
 }

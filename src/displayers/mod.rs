@@ -1,19 +1,21 @@
-//this file will hold any fucnions that display or print out anythning
-//to the stdout
+//this module will handle any kind of output to the terminal
 
 pub mod display {
 
+    //downloaded crates
     use colored::*;
     use std::{env::*, path::Path};
 
+    //local crates
     use crate::formatters;
+
     fn filled_string(msg: &str) -> ColoredString {
         msg.green().bold().italic()
     }
     fn not_filled_string(msg: &str) -> ColoredString {
         msg.red().bold().strikethrough()
     }
-    fn tital_string(msg: &str) -> ColoredString {
+    fn title_string(msg: &str) -> ColoredString {
         msg.blue().bold().italic()
     }
     fn cat_string(msg: &str) -> ColoredString {
@@ -25,7 +27,7 @@ pub mod display {
     //this is the funciton to display the request data is a colorful and readable way
     pub fn display_request_data(data: &formatters::format::RequestData) {
         let welcome_message =
-            crate::displayers::display::tital_string("\n\n----GIVEN REQUEST----\n\n");
+            crate::displayers::display::title_string("\n\n----GIVEN REQUEST----\n\n");
         let body = if data.body == "".to_string() {
             crate::displayers::display::not_filled_string("no body")
         } else {
@@ -92,7 +94,7 @@ pub mod display {
     }
     pub fn display_response_data(data: &formatters::format::ReponseData) {
         let welcome_message =
-            crate::displayers::display::tital_string("\n\n----RECIVED RESPONSE ----\n\n");
+            crate::displayers::display::title_string("\n\n----RECIVED RESPONSE ----\n\n");
         let status: ColoredString;
         if data.status.starts_with("3") {
             status = crate::displayers::display::warn_filled(&data.status);

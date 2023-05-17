@@ -1,5 +1,4 @@
-// this will be the package that will handle the building of the request and possiblly making the request
-// will add all of the promting things in this file if i end up doing it
+//this module will be the handlers of the project i.e. making the network requests or running the program
 
 pub mod handler {
 
@@ -10,6 +9,7 @@ pub mod handler {
     use crate::formatters;
 
     pub fn make_request(request_data: formatters::format::RequestData) {
+        //the truncate value is just a bool so cloning isnt expensive
         let truncate = request_data.truncate.clone();
         //display request data
         displayers::display::display_request_data(&request_data);
@@ -56,8 +56,7 @@ pub mod handler {
                 .body(request_data.body),
         }
     }
-    //this should just display the help message when no arguments are given to
-    //the program
+    //made a run function to make a clean way of handling empty arguments to the program
     pub fn run_program() {
         match std::env::args().len() {
             1 => crate::displayers::display::display_help(),

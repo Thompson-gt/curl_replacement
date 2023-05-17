@@ -1,21 +1,10 @@
-//this will be the package that will change the format of user data
-//to be in a usable form for me
-
-//NOTE might replace the dummy values with option returns then check for none
-//when the fucnions are called
-
-//split up the files into smaller files so it is more readable
-//maybe like a display file to disply text and a types folder to hold the custuom types
+//this will be the module that will handle all of the formatting and modifying
+//how the data looks, including the custom types
 
 pub mod format {
-    //finish the main file to make the and display the request then recive the
-    //response then display it,
-    //will need to fix the "make_request" funtion to display the response instead of
-    //just returning the unreadable string
 
-    //create a type for the response type so it can be displayed
-    // in a colorful and readable fashion
     use clap::Parser;
+    use reqwest;
 
     #[derive(Debug)]
     pub struct ReponseData {
@@ -27,6 +16,7 @@ pub mod format {
         pub body: String,
         pub truncate: bool,
     }
+    //weird this isnt a funcion that comes with the lib
     fn version_to_string(v: reqwest::Version) -> String {
         match v {
             reqwest::Version::HTTP_09 => "HTTP/0.9".to_string(),
@@ -85,9 +75,6 @@ pub mod format {
         pub key: String,
         pub value: String,
     }
-    //make a funtion to add the regular params to the url
-    //make a funtion to add the query params to the url, also need format
-    //the qeuery params to the proper format
     #[derive(Debug, Clone)]
     pub enum RequestType {
         GET,
@@ -194,9 +181,6 @@ pub mod format {
     //will create the string what will be added to the final url stirng
     //needs to iterate though the vec of jsontypes and the needed symbols for the query params
     fn format_query_params(query_params: Vec<JsonTypes>) -> String {
-        //NOTE could build a vec of the string vesions of the params then
-        //iterate throught that vec and create the final url if this doesnt work
-        //this is how a query param should start
         let mut final_url = "/?".to_string();
         //if there is only one query param then format it then return it
         if query_params.len() == 1 {
@@ -227,7 +211,7 @@ pub mod format {
         });
         map
     }
-    #[derive(Debug, Clone)]
+    #[derive(Debug)]
     pub struct RequestData {
         pub body: String,
         pub url: String,
@@ -244,7 +228,6 @@ pub mod format {
         let params = crate::formatters::format::format_regular_parmas(params);
         format!("{}{}{}", base_url, params, query_params)
     }
-    //if the full url is present just make the request without bothering with the rest
     pub fn build_request_data(args: ClientArgs) -> RequestData {
         //wtf this syntax is great
         RequestData {

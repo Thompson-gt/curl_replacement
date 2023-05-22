@@ -6,6 +6,8 @@ pub mod format {
     use clap::Parser;
     use reqwest;
 
+    //alias for any fucntion that builds a custom type
+    type BuildResult<T> = std::result::Result<T, String>;
     #[derive(Debug)]
     pub struct ReponseData {
         pub status: String,
@@ -18,15 +20,16 @@ pub mod format {
         pub safe_view: bool,
     }
     //weird this isnt a funcion that comes with the lib
-    fn version_to_string(v: reqwest::Version) -> String {
-        match v {
+    fn version_to_string(v: reqwest::Version) -> BuildResult<String> {
+        let http = match v {
             reqwest::Version::HTTP_09 => "HTTP/0.9".to_string(),
             reqwest::Version::HTTP_10 => "HTTP/1.0".to_string(),
             reqwest::Version::HTTP_11 => "HTTP/1.1".to_string(),
             reqwest::Version::HTTP_2 => "HTTP/2.0".to_string(),
             reqwest::Version::HTTP_3 => "HTTP/3.0".to_string(),
             _ => "failed when getting version".to_string(),
-        }
+        };
+        Ok(http)
     }
     //this will be the funcion to take in response and build it to
     // the custom type so it can be displayed in a readable fashion
@@ -34,9 +37,9 @@ pub mod format {
         data: reqwest::blocking::Response,
         truncate: bool,
         safe_view: bool,
-    ) -> ReponseData {
+    ) -> BuildResult<ReponseData> {
         //match statements are kinda awsesome
-        ReponseData {
+        let data = ReponseData {
             status: data.status().to_string(),
             content_length: match data.content_length() {
                 Some(c) => c.to_string(),
@@ -52,7 +55,7 @@ pub mod format {
                 Some(a) => a.to_string(),
                 None => "failed to find the servers address".to_string(),
             },
-            version: crate::formatters::format::version_to_string(data.version()),
+            version: crate::formatters::format::version_to_string(data.version())?,
             body: match data.text() {
                 Ok(b) => {
                     if truncate && b.len() >= 500 {
@@ -61,11 +64,13 @@ pub mod format {
                         b
                     }
                 }
+                //this error means that the body is empty so i wont touch it
                 Err(_) => "no body in response".to_string(),
             },
             truncate,
             safe_view,
-        }
+        };
+        Ok(data)
     }
     pub fn headermap_to_string(header: &reqwest::header::HeaderMap) -> String {
         let mut final_string = "".to_string();
@@ -106,7 +111,7 @@ pub mod format {
         //will convert the enum to a string
         //dont have to give a defalut pattern becuse the enum wont allow any non
         //specified value to be passed to the funtion(gotta love static type checking)
-        pub fn request_to_string(input: RequestType) -> String {
+        pub fn request_to_string(input: &RequestType) -> String {
             match input {
                 RequestType::GET => "GET".to_string(),
                 RequestType::DELETE => "DELETE".to_string(),
@@ -237,9 +242,9 @@ pub mod format {
         let params = crate::formatters::format::format_regular_parmas(params);
         format!("{}{}{}", base_url, params, query_params)
     }
-    pub fn build_request_data(args: ClientArgs) -> RequestData {
+    pub fn build_request_data(args: ClientArgs) -> BuildResult<RequestData> {
         //wtf this syntax is great
-        RequestData {
+        let data = RequestData {
             body: match args.body {
                 Some(b) => b,
                 None => "".to_string(),
@@ -278,6 +283,7 @@ pub mod format {
             },
             truncate: args.truncate,
             safe_mode: args.safe_mode,
-        }
+        };
+        Ok(data)
     }
 }

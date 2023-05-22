@@ -53,8 +53,7 @@ pub mod display {
             crate::displayers::display::filled_string(&data.querys)
         };
         let t = crate::displayers::display::filled_string(
-            crate::formatters::format::RequestType::request_to_string(data.rtype.to_owned())
-                .as_str(),
+            crate::formatters::format::RequestType::request_to_string(&data.rtype).as_str(),
         );
         let safe_mode = if data.safe_mode {
             crate::displayers::display::warn_filled("TRUE")
@@ -202,5 +201,26 @@ pub mod display {
             Err(e) => panic!("error when reading help file: {}", e),
         };
         print!("{}", contents);
+    }
+    pub fn display_final_message_success() {
+        let msg = "YOUR REQUEST WAS SUCCESSFULLY MADE"
+            .to_string()
+            .green()
+            .bold();
+        print!(
+            "{}: {}\n",
+            crate::displayers::display::cat_string("REQUEST RESULT"),
+            msg
+        );
+    }
+    pub fn display_final_message_failed(e: reqwest::Error) {
+        let msg = format!("ERROR WHEN MAKING THE REQUEST: {}", e.to_string())
+            .bold()
+            .red();
+        print!(
+            "{}: {}\n",
+            crate::displayers::display::cat_string("REQUEST RESULT"),
+            msg
+        );
     }
 }

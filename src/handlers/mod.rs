@@ -8,7 +8,9 @@ pub mod handler {
     use crate::displayers;
     use crate::formatters;
 
-    pub fn make_request(request_data: formatters::format::RequestData) {
+    type RequestResult = std::result::Result<(), reqwest::Error>;
+
+    pub fn make_request(request_data: formatters::format::RequestData) -> RequestResult {
         //cloning of 2 bools are cheap enough for me not to bother with other ways around the borrow checker
         let truncate = request_data.truncate.clone();
         let safe_mode = request_data.safe_mode.clone();
@@ -17,15 +19,16 @@ pub mod handler {
         //make the client in here becuase i am assuming its a synchronious req
         let http_client = reqwest::blocking::Client::new();
         //configure the request and make it (handle the error)
-        let res =
-            match crate::handlers::handler::configure_request(request_data, http_client).send() {
-                Ok(r) => r,
-                Err(e) => panic!("error when making the request:{}", e),
-            };
+        let res = crate::handlers::handler::configure_request(request_data, http_client).send()?;
         //build response data
-        let response_data = formatters::format::build_response_data(res, truncate, safe_mode);
+        let response_data = match formatters::format::build_response_data(res, truncate, safe_mode)
+        {
+            Ok(r) => r,
+            Err(e) => panic!("error when building response data: {}", e),
+        };
         //display response data
         displayers::display::display_response_data(&response_data);
+        Ok(())
     }
 
     fn configure_request(
@@ -63,8 +66,14 @@ pub mod handler {
             1 => crate::displayers::display::display_help(),
             _ => {
                 let args = formatters::format::ClientArgs::parse();
-                let request_data = formatters::format::build_request_data(args);
-                make_request(request_data);
+                let request_data = match formatters::format::build_request_data(args) {
+                    Ok(data) => data,
+                    Err(e) => panic!("problem when building the request data: {}", e),
+                };
+                match make_request(request_data) {
+                    Ok(_) => displayers::display::display_final_message_success(),
+                    Err(e) => displayers::display::display_final_message_failed(e),
+                };
             }
         }
     }

@@ -85,7 +85,7 @@ pub mod format {
         final_string
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct JsonTypes {
         pub key: String,
         pub value: String,
@@ -195,6 +195,10 @@ pub mod format {
     //needs to iterate though the vec of jsontypes and the needed symbols for the query params
     fn format_query_params(query_params: Vec<JsonTypes>) -> String {
         let mut final_url = "/?".to_string();
+        // need this to remove the trailing "/" at the end of the url
+        if query_params.len() == 0 {
+            return "".to_string();
+        }
         //if there is only one query param then format it then return it
         if query_params.len() == 1 {
             final_url = format!(

@@ -5,7 +5,6 @@ pub mod format {
 
     use clap::Parser;
     use reqwest;
-
     //alias for any fucntion that builds a custom type
     type BuildResult<T> = std::result::Result<T, String>;
     #[derive(Debug)]
@@ -72,6 +71,12 @@ pub mod format {
         };
         Ok(data)
     }
+
+    // will replace the single quotes with double quotes and make the string into a raw stirng
+    pub fn encode_body(body: String) -> String {
+        body.trim().replace("'", r#"""#)
+    }
+
     pub fn headermap_to_string(header: &reqwest::header::HeaderMap) -> String {
         let mut final_string = "".to_string();
         for val in header.iter() {
@@ -228,7 +233,7 @@ pub mod format {
         });
         map
     }
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct RequestData {
         pub body: String,
         pub url: String,
@@ -250,7 +255,8 @@ pub mod format {
         //wtf this syntax is great
         let data = RequestData {
             body: match args.body {
-                Some(b) => b,
+                // this needs to be formated before sent with request
+                Some(b) => crate::formatters::format::encode_body(b),
                 None => "".to_string(),
             },
             url: match args.url {

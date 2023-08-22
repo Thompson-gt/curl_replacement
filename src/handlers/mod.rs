@@ -70,6 +70,8 @@ pub mod handler {
                     Ok(data) => data,
                     Err(e) => panic!("problem when building the request data: {}", e),
                 };
+                // let t = request_data.clone();
+                // print!("{:?}", t);
                 match make_request(request_data) {
                     Ok(_) => displayers::display::display_final_message_success(),
                     Err(e) => displayers::display::display_final_message_failed(e),

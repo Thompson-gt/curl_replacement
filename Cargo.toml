@@ -7,8 +7,8 @@ edition = "2021"
 
 [dependencies]
 #https://docs.rs/clap/latest/clap/_derive/index.html#arg-attributes
-clap = {version = "4.2.7", features = ["derive"]}
+clap = { version = "4.2.7", features = ["derive"] }
 #https://crates.io/crates/colored
 colored = "2.0.0"
 #https://docs.rs/reqwest/latest/reqwest/
-reqwest = { version = "0.11", features = ["json","blocking"] }
+reqwest = { version = "0.11", features = ["json", "blocking"] }

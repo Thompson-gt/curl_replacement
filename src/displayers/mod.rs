@@ -63,12 +63,6 @@ pub mod display {
         print!("{}", welcome_message);
         print!(
             "{}: {}\n",
-            // "REQUEST BODY".to_string().underline().bold().cyan(),
-            crate::displayers::display::cat_string("REQUEST BODY"),
-            body
-        );
-        print!(
-            "{}: {}\n",
             crate::displayers::display::cat_string("REQUEST URL"),
             url
         );

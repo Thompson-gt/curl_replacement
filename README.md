@@ -14,6 +14,10 @@
 
 `cargo run -- --url "https://pokeapi.co/api/v2/pokemon/ditto" -t`
 
+##### _**example on how to use a POST request**_
+
+`cargo run -- --domain "localhost:5000/login -- body "{'username' : 'exampleUser', 'email' : 'exampleEmail@example.com'}" -r "post"`
+
 #### _this to see all of the options this tool offers_
 
 `cargo run -- -h`

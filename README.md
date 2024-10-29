@@ -1,6 +1,7 @@
 ## **curl replacemant tool**
 
 #### the goal of this program was to have a readable and simply way of querying websites/endpoints without the plain curl tool or without having to open up postman to have it displayed in a cleaner fashion
+#### only supports http and https "might add websocket support later"
 
 ##### _was written in rust for the fun of it and was a good chance to learn the language_
 

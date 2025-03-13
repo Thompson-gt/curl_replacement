@@ -1,7 +1,6 @@
 //this will be the module that will handle all of the formatting and modifying
 //how the data looks, including the custom types
 
-pub mod format {
 
     use clap::Parser;
     use reqwest;
@@ -46,7 +45,7 @@ pub mod format {
                 None => "0".to_string(),
             },
             headers: if !safe_view {
-                crate::formatters::format::headermap_to_string(data.headers())
+                crate::formatter::headermap_to_string(data.headers())
             } else {
                 "headers hidden".to_string()
             },
@@ -54,7 +53,7 @@ pub mod format {
                 Some(a) => a.to_string(),
                 None => "failed to find the servers address".to_string(),
             },
-            version: crate::formatters::format::version_to_string(data.version())?,
+            version: crate::formatter::version_to_string(data.version())?,
             body: match data.text() {
                 Ok(b) => {
                     if truncate && b.len() >= 500 {
@@ -247,8 +246,9 @@ pub mod format {
     //this will be a function that will add the query params and regular
     //params to the url before the request is made
     pub fn build_url(base_url: String, query_params: Vec<JsonTypes>, params: String) -> String {
-        let query_params = crate::formatters::format::format_query_params(query_params);
-        let params = crate::formatters::format::format_regular_parmas(params);
+        let query_params = crate::formatter::format_query_params(query_params);
+        let params = crate::formatter::format_regular_parmas(params);
+
         format!("{}{}{}", base_url, params, query_params)
     }
     pub fn build_request_data(args: ClientArgs) -> BuildResult<RequestData> {
@@ -256,7 +256,7 @@ pub mod format {
         let data = RequestData {
             body: match args.body {
                 // this needs to be formated before sent with request
-                Some(b) => crate::formatters::format::encode_body(b),
+                Some(b) => crate::formatter::encode_body(b),
                 None => "".to_string(),
             },
             url: match args.url {
@@ -288,12 +288,11 @@ pub mod format {
                 None => "".to_string(),
             },
             rtype: match args.rtype {
-                Some(t) => crate::formatters::format::RequestType::string_to_val(t.as_str()),
-                None => crate::formatters::format::RequestType::GET,
+                Some(t) => crate::formatter::RequestType::string_to_val(t.as_str()),
+                None => crate::formatter::RequestType::GET,
             },
             truncate: args.truncate,
             safe_mode: args.safe_mode,
         };
         Ok(data)
     }
-}

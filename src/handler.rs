@@ -9,7 +9,6 @@ use crate::errors::ValidError;
 use crate::formatter;
 use crate::types as interalTypes;
 
-// TOP LEVEL CALL
 pub fn make_request(request_data: interalTypes::RequestData) -> interalTypes::BuildResult<()> {
     //cloning of 2 bools are cheap enough for me not to bother with other ways around the borrow checker
     let truncate = request_data.truncate.clone();
@@ -36,7 +35,6 @@ fn configure_request(
     http_client: reqwest::blocking::Client,
 ) -> RequestBuilder {
     //build the url here before returing the request to be made
-    //NOTE: NEED TO RETURN AND CHECK FOR ERRORS HERE IT IS A TOP LEVEL CALL TO OTHER FUNCITONS
     let current_headers: Vec<interalTypes::JsonTypes> =
         formatter::parse_json_types(request_data.xheaders);
     let current_headers = formatter::to_header_map(current_headers);
@@ -61,7 +59,7 @@ fn configure_request(
             .body(request_data.body),
     }
 }
-//made a run function to make a clean way of handling empty arguments to the program
+// main entry point to the program 
 pub fn run_program() {
     match std::env::args().len() {
         1 => crate::displayer::display_help(),
